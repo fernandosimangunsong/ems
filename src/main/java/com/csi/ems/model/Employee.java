@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
+
 
 import lombok.Data;
 
@@ -25,11 +25,11 @@ public class Employee implements Serializable {
     @NotNull
     @Size(max = 65)
     @Column(name = "first_name")
-    private String firstName;
+    private String first_name;
 
     @Size(max = 65)
-    @Column(name = "last_name")
-    private String lastName;
+    @Column(name = "first_name")
+    private String last_name;
 
     @NotNull
     @Email
@@ -37,16 +37,17 @@ public class Employee implements Serializable {
     @Column(unique = true)
     private String email;
 
-    @NotNull
-    @Size(max = 128)
-    private String password;
+    @ManyToOne
+    private Departemen departemen;
 
-    @NotNull
-    @Column(name = "departemen")
-    private String departemen;
+    @ManyToOne
+    private  Company company;
 
     @Column(name = "startWork")
     private Date startWork;
+
+    @Column(name="positition")
+    private String positition;
 
     @Column(name = "cv")
     private String cv;
@@ -56,7 +57,7 @@ public class Employee implements Serializable {
 
     @Column(name = "phone_number")
     @Size(max = 15)
-    private String phoneNumber;
+    private String phone_number;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 10)
@@ -64,23 +65,11 @@ public class Employee implements Serializable {
 
     @Temporal(TemporalType.DATE)
     @Column(name = "dob")
-    private Date dateOfBirth;
+    private Date dob;
 
     @Size(max = 100)
-    @Column(name = "address1")
-    private String address1;
-
-    @Size(max = 100)
-    @Column(name = "street")
-    private String street;
-
-    @Size(max = 100)
-    @Column(name = "city")
-    private String city;
-
-    @Size(max = 100)
-    @Column(name = "state")
-    private String state;
+    @Column(name = "address")
+    private String address;
 
     @Size(max = 100)
     private String country;
@@ -97,11 +86,6 @@ public class Employee implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt = new Date();
 
-//    @ManyToMany(cascade = CascadeType.ALL)
-//    @JoinTable(name = "employee_company",
-//            joinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"),
-//            inverseJoinColumns = @JoinColumn(name = "company_id", referencedColumnName = "id"))
-//    private Set<Company> company;
 
 
 }

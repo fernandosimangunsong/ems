@@ -1,6 +1,7 @@
 package com.csi.ems.controller;
 
 import com.csi.ems.CompanyRepository;
+import com.csi.ems.model.ApiResponse;
 import com.csi.ems.model.Company;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,27 +19,56 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 class CompanyController {
-    private CompanyRepository repository;
+    private CompanyRepository companyRepository;
 
     @Autowired
     public CompanyController(CompanyRepository companyRepository){
-        this.repository = companyRepository;
+        this.companyRepository = companyRepository;
+    }
+
+
+    @PostMapping("/login")
+    public ApiResponse login(@RequestParam  String email, @RequestParam String password) {
+
+        try {
+            Company user = companyRepository.findCompanyByEmail(email);
+            if(user == null ) {
+                return new ApiResponse(400, "User does not exist.", user) ;
+            }
+            if(!user.getPassword().equals(password)){
+                return new ApiResponse(400, "Password mismatch") ;
+            }else{
+                return new ApiResponse(200, "Login success", user) ;
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ApiResponse(400, "Error");
+        }
     }
 
     @PostMapping(path = "/addCompany")
     @ResponseStatus(HttpStatus.CREATED)
-    public @Valid Company addCompany(@Valid @RequestBody Company newCompany){
-        return repository.save(newCompany);
+    public ApiResponse addCompany(@Valid @RequestBody Company newCompany){
+        try {
+            companyRepository.save(newCompany);
+            return new ApiResponse(200, "Register success", newCompany);
+        }catch (Exception e){
+             e.printStackTrace();
+            return new ApiResponse(400, "Error", newCompany);
+        }
+
     }
+
 
     @GetMapping(path = "/profile")
     public ResponseEntity<List<Company>> findCompany() {
-        return ResponseEntity.ok(repository.findAll());
+        return ResponseEntity.ok(companyRepository.findAll());
     }
 
     @GetMapping(path = "/profile/{id}")
     public ResponseEntity<Company> findCompany(@PathVariable Long id) {
-        Optional<Company> comppany = repository.findById(id);
+        Optional<Company> comppany = companyRepository.findById(id);
 
         if (!comppany.isPresent()) {
             log.error("Id " + id + " is not existed");
@@ -53,12 +83,26 @@ class CompanyController {
     @PutMapping("/edit/{id}")
     public ResponseEntity<Company> update(@PathVariable Long id, @Valid @RequestBody Company company) {
         company.setId(id);
-        if (!repository.findById(id).isPresent()) {
+        if (!companyRepository.findById(id).isPresent()) {
             log.error("Id " + id + " is not existed");
             ResponseEntity.badRequest().build();
+            
         }
 
-        return ResponseEntity.ok(repository.save(company));
+        return ResponseEntity.ok(companyRepository.save(company));
+    }
+
+    @PutMapping(path = "/editCompany")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse editCompany(@Valid @RequestBody Company updateCompany){
+        try {
+            companyRepository.save(updateCompany);
+            return new ApiResponse(200, "Update success");
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ApiResponse(400, "Error");
+        }
+
     }
 
 
